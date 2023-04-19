@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.BetaOpenAI
 import com.example.domain.usecase.SendChatUseCase
+import com.example.presentation.state.GptState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,11 +15,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChatUseCase) :
     ViewModel() {
+    private val _gptSate = MutableStateFlow<GptState>(GptState.Loading)
+    val gptState = _gptSate
     fun sendChat(chat: String) = viewModelScope.launch {
         sendChatUseCase.invoke(chat).catch {
-
+            gptState.value = GptState.Error(it)
         }.collect {
-            Log.e("chat", "$it")
+            Log.e("chat","$it")
+            gptState.value = GptState.Success(flow { emit(it) })
         }
     }
 }
