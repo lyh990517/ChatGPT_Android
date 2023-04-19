@@ -22,13 +22,9 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     fun sendChat(chat: String) = viewModelScope.launch {
         val flow = flow{
             sendChatUseCase.invoke(chat).catch {
-                Log.e("it", "${it.message}")
                 gptState.value = GptState.Error(it)
-            }.filter {
-                it.choices[0].delta?.content != null
             }.collect {
                 emit(it)
-                Log.e("chat", "${it.choices[0].delta?.content}")
             }
         }
         gptState.value = GptState.Success(flow)
