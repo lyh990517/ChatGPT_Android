@@ -4,6 +4,10 @@ package com.example.feature_chat
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,14 +21,14 @@ import kotlinx.coroutines.flow.collect
 @OptIn(BetaOpenAI::class)
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
-    Log.e("recompose","ChatScreen!!!!!!!!")
+    Log.e("recompose", "ChatScreen!!!!!!!!")
     val state = gptViewModel.gptState.collectAsState()
-    val text = rememberSaveable {
-        mutableStateOf("")
+    val text = remember {
+        mutableListOf<String>()
     }
     gptViewModel.sendChat("where is korea?")
 
-    ChatContent(state,text)
+    ChatContent(state, text)
     BackHandler {
         navigator.popBackStack()
     }
@@ -33,25 +37,30 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 @Composable
 private fun ChatContent(
     state: State<GptState>,
-    text: MutableState<String>
+    text: MutableList<String>
 ) {
-    Log.e("recompose","ChatContent!!!!!!!!")
+    Log.e("recompose", "ChatContent!!!!!!!!")
+    val lazyRowScope = rememberLazyListState()
+    val lazyRowItems = remember(state.value) { mutableStateListOf<String>() }
+
     when (state.value) {
         is GptState.Success -> {
             val data = state.value as GptState.Success
-            LaunchedEffect(Unit){
+            LaunchedEffect(Unit) {
                 data.chatData.collect{
-                    text.value = it.choices[0].delta?.content ?: ""
+                    lazyRowItems.add(it.choices[0].delta?.content ?: "")
+                    lazyRowScope.scrollToItem(lazyRowItems.lastIndex)
                 }
+                Log.e("text", "$text")
             }
+        }
+        is GptState.End ->{
         }
         else -> {}
     }
-    Chat(text)
-}
-
-@Composable
-private fun Chat(text: MutableState<String>) {
-    Log.e("recompose","ChatContent!!!!!!!!")
-    Text(text = text.value)
+    LazyRow(state = lazyRowScope) {
+        items(lazyRowItems) {
+            Text(text = it)
+        }
+    }
 }
