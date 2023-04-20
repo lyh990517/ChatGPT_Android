@@ -4,19 +4,21 @@ package com.example.feature_chat
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aallam.openai.api.BetaOpenAI
@@ -26,14 +28,19 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val state = gptViewModel.gptState.collectAsState()
-    Column (verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()){
+    val scrollState = rememberScrollState()
+    Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
         Column(
             Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
+                .fillMaxHeight()
                 .weight(5f)
-                .verticalScroll(rememberScrollState())) {
-            Chat(state)
+                .verticalScroll(scrollState)
+        ) {
+            Chat(state, scrollState)
         }
-        Input(gptViewModel,Modifier)
+        Input(gptViewModel, Modifier)
     }
     BackHandler {
         navigator.popBackStack()
@@ -41,7 +48,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 }
 
 @Composable
-private fun Input(viewModel: ChatGPTViewModel,modifier: Modifier) {
+private fun Input(viewModel: ChatGPTViewModel, modifier: Modifier) {
     val input = remember {
         mutableStateOf("")
     }
@@ -54,7 +61,7 @@ private fun Input(viewModel: ChatGPTViewModel,modifier: Modifier) {
         Button(onClick = { viewModel.sendChat(input.value) }) {
             Text(text = "send")
         }
-        Button(onClick = { viewModel.gptState.value = GptState.End}) {
+        Button(onClick = { viewModel.gptState.value = GptState.End }) {
             Text(text = "reset")
         }
     }
@@ -63,6 +70,7 @@ private fun Input(viewModel: ChatGPTViewModel,modifier: Modifier) {
 @Composable
 private fun Chat(
     state: State<GptState>,
+    scrollState: ScrollState
 ) {
     val chat = remember(state.value) { mutableStateOf("") }
     when (state.value) {
@@ -71,6 +79,7 @@ private fun Chat(
             LaunchedEffect(Unit) {
                 data.chatData.collect {
                     chat.value += it.choices[0].delta?.content ?: ""
+                    scrollState.animateScrollTo(scrollState.maxValue)
                 }
             }
         }
@@ -82,5 +91,5 @@ private fun Chat(
         }
         else -> {}
     }
-    Text(text = chat.value)
+    Text(text = chat.value, fontSize = 18.sp)
 }
