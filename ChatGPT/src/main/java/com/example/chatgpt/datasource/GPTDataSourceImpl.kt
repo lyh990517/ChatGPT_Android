@@ -1,10 +1,7 @@
 package com.example.chatgpt.datasource
 
 import com.aallam.openai.api.BetaOpenAI
-import com.aallam.openai.api.chat.ChatCompletionChunk
-import com.aallam.openai.api.chat.ChatCompletionRequest
-import com.aallam.openai.api.chat.ChatMessage
-import com.aallam.openai.api.chat.ChatRole
+import com.aallam.openai.api.chat.*
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
@@ -27,5 +24,18 @@ class GPTDataSourceImpl @Inject constructor(private val openAI: OpenAI) : GPTDat
             )
         )
         return openAI.chatCompletions(chatCompletionRequest)
+    }
+
+    override suspend fun sendChatNoFlow(chat: String): ChatCompletion {
+        val chatCompletionRequest = ChatCompletionRequest(
+            model = ModelId("gpt-3.5-turbo"),
+            messages = listOf(
+                ChatMessage(
+                    role = ChatRole.User,
+                    content = chat
+                )
+            )
+        )
+        return openAI.chatCompletion(chatCompletionRequest)
     }
 }

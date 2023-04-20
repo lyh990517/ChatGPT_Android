@@ -72,6 +72,12 @@ private fun Chat(
                 }
             }
         }
+        is GptState.SuccessNoFlow -> {
+            val data = state.value as GptState.SuccessNoFlow
+            LaunchedEffect(Unit) {
+                chat.value = data.chatData.choices[0].message?.content ?: ""
+            }
+        }
         is GptState.End -> {
         }
         is GptState.Error -> {

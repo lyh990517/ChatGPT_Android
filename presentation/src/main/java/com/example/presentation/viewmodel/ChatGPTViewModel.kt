@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletionChunk
+import com.example.domain.usecase.SendChatNoFlowUseCase
 import com.example.domain.usecase.SendChatUseCase
 import com.example.presentation.state.GptState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,21 +16,25 @@ import javax.inject.Inject
 
 @OptIn(BetaOpenAI::class)
 @HiltViewModel
-class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChatUseCase) :
+class ChatGPTViewModel @Inject constructor(
+    private val sendChatUseCase: SendChatUseCase,
+    private val sendChatNoFlowUseCase: SendChatNoFlowUseCase
+    ) :
     ViewModel() {
     private val _gptSate = MutableStateFlow<GptState>(GptState.Loading)
     val gptState = _gptSate
     fun sendChat(chat: String) = viewModelScope.launch {
-        Log.e("chat", chat)
         val flow = flow {
-            sendChatUseCase.invoke(chat).catch {
-                Log.e("chat", it.message!!)
+            sendChatUseCase.getFlow(chat).catch {
                 gptState.value = GptState.Error(it)
             }.collect {
-                Log.e("chat", "$it")
                 emit(it)
             }
         }
         gptState.value = GptState.Success(flow)
+    }
+
+    fun sendChatNoFlow(chat: String) = viewModelScope.launch {
+        gptState.value = GptState.SuccessNoFlow(sendChatNoFlowUseCase.getChat(chat))
     }
 }

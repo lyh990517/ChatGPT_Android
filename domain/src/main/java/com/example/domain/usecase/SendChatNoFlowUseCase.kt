@@ -5,8 +5,7 @@ import com.example.domain.repository.ChatGPTRepository
 import javax.inject.Inject
 
 @OptIn(BetaOpenAI::class)
-class SendChatUseCase @Inject constructor(private val chatGPTRepository: ChatGPTRepository) {
-    suspend fun getFlow(chat:String) = chatGPTRepository.sendChat(chat)
+class SendChatNoFlowUseCase  @Inject constructor(private val chatGPTRepository: ChatGPTRepository) {
 
     suspend fun getChat(chat: String) = chatGPTRepository.sendChatNoFlow(chat)
 }
