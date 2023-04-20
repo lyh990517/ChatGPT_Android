@@ -58,7 +58,10 @@ private fun Input(viewModel: ChatGPTViewModel, modifier: Modifier) {
             onValueChange = { input.value = it },
             modifier = Modifier.weight(1f)
         )
-        Button(onClick = { viewModel.sendChat(input.value) }) {
+        Button(onClick = {
+            viewModel.sendChat(input.value)
+            input.value = ""
+        }) {
             Text(text = "send")
         }
         Button(onClick = { viewModel.gptState.value = GptState.End }) {
