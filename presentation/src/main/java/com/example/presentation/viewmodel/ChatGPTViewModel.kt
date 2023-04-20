@@ -20,10 +20,13 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     private val _gptSate = MutableStateFlow<GptState>(GptState.Loading)
     val gptState = _gptSate
     fun sendChat(chat: String) = viewModelScope.launch {
-        val flow = flow{
+        Log.e("chat", chat)
+        val flow = flow {
             sendChatUseCase.invoke(chat).catch {
+                Log.e("chat", it.message!!)
                 gptState.value = GptState.Error(it)
             }.collect {
+                Log.e("chat", "$it")
                 emit(it)
             }
         }

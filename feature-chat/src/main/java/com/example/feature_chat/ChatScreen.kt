@@ -4,8 +4,14 @@ package com.example.feature_chat
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.aallam.openai.api.BetaOpenAI
@@ -15,11 +21,29 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val state = gptViewModel.gptState.collectAsState()
-    gptViewModel.sendChat("make the calculator on C#")
-
-    Chat(state)
+    Column (verticalArrangement = Arrangement.SpaceBetween){
+        Chat(state)
+        Input(gptViewModel)
+    }
     BackHandler {
         navigator.popBackStack()
+    }
+}
+
+@Composable
+private fun Input(viewModel: ChatGPTViewModel) {
+    val input = remember {
+        mutableStateOf("")
+    }
+    Row {
+        TextField(
+            value = input.value,
+            onValueChange = { input.value = it },
+            modifier = Modifier.weight(1f)
+        )
+        Button(onClick = { viewModel.sendChat(input.value) }) {
+            Text(text = "send")
+        }
     }
 }
 
