@@ -30,7 +30,6 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
         Column(
             Modifier
                 .weight(5f)
-                .background(Color.LightGray)
                 .verticalScroll(rememberScrollState())) {
             Chat(state)
         }
@@ -54,6 +53,9 @@ private fun Input(viewModel: ChatGPTViewModel,modifier: Modifier) {
         )
         Button(onClick = { viewModel.sendChat(input.value) }) {
             Text(text = "send")
+        }
+        Button(onClick = { viewModel.gptState.value = GptState.End}) {
+            Text(text = "reset")
         }
     }
 }
