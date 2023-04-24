@@ -24,8 +24,9 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val scrollState = rememberScrollState()
     val state = gptViewModel.gptState.collectAsState()
+    Log.e("ChatScreen", "recompose")
     LaunchedEffect(state.value) {
-        Log.e("launch","${state.value}")
+        Log.e("launch", "${state.value}")
         when (state.value) {
             is GptState.Success -> {
                 val data = state.value as GptState.Success
@@ -40,6 +41,9 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             is GptState.Error -> {
 
             }
+            is GptState.Loading -> {
+
+            }
             else -> {}
         }
     }
@@ -52,20 +56,9 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
                 .weight(5f)
                 .verticalScroll(scrollState)
         ) {
-            Chat(gptViewModel.chat.collectAsState().value)
+            Chat(gptViewModel)
         }
-        Input(
-            inputChange = {
-                gptViewModel.input.value = it
-            },
-            onSend = {
-                gptViewModel.sendChat(it)
-            },
-            onReset = {
-                gptViewModel.gptState.value = it
-            },
-            text = gptViewModel.input.value
-        )
+        Input(gptViewModel)
     }
     BackHandler {
         navigator.popBackStack()
@@ -73,12 +66,13 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 }
 
 @Composable
-private fun Input(
+private fun InputStateLess(
     inputChange: (String) -> Unit,
     onSend: (String) -> Unit,
     onReset: (GptState) -> Unit,
     text: String
 ) {
+    Log.e("Input", "recompose")
     Row {
         TextField(
             value = text,
@@ -97,8 +91,27 @@ private fun Input(
 }
 
 @Composable
-private fun Chat(
-    text: String,
+private fun Input(
+    gptViewModel: ChatGPTViewModel
 ) {
-    Text(text = text, fontSize = 18.sp)
+    InputStateLess(
+        inputChange = {
+            gptViewModel.input.value = it
+        },
+        onSend = {
+            gptViewModel.sendChat(it)
+        },
+        onReset = {
+            gptViewModel.gptState.value = it
+        },
+        text = gptViewModel.input.value
+    )
+}
+
+@Composable
+private fun Chat(
+    gptViewModel: ChatGPTViewModel,
+) {
+    Log.e("Input", "Chat")
+    Text(text = gptViewModel.chat.collectAsState().value, fontSize = 18.sp)
 }
