@@ -29,9 +29,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
     LaunchedEffect(state.value) {
         when (state.value) {
             is GptState.LoadChat -> scrollState.animateScrollTo(scrollState.maxValue)
-            is GptState.End -> {
-                gptViewModel.chatResult.value += "\n \n \n"
-            }
+            is GptState.End -> gptViewModel.chatGenerationEnd()
             is GptState.Error -> {
 
             }
