@@ -12,5 +12,5 @@ sealed class GptState {
 
     data class Error(val t: Throwable) : GptState()
 
-    object End : GptState()
+    data class End(val data: ChatCompletionChunk) : GptState()
 }

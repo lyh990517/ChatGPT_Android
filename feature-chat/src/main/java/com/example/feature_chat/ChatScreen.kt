@@ -30,7 +30,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
         when (state.value) {
             is GptState.LoadChat -> scrollState.animateScrollTo(scrollState.maxValue)
             is GptState.End -> {
-
+                gptViewModel.chatResult.value += "\n \n \n"
             }
             is GptState.Error -> {
 
@@ -71,7 +71,6 @@ private fun ChatContent(
 private fun InputStateLess(
     inputChange: (String) -> Unit,
     onSend: (String) -> Unit,
-    onReset: (GptState) -> Unit,
     text: String
 ) {
     Log.e("compose", "InputStateLess")
@@ -86,9 +85,6 @@ private fun InputStateLess(
         }) {
             Text(text = "send")
         }
-        Button(onClick = { onReset(GptState.End) }) {
-            Text(text = "reset")
-        }
     }
 }
 
@@ -100,7 +96,6 @@ private fun Input(
         InputStateLess(
             inputChange = inputChange,
             onSend = onSend,
-            onReset = onReset,
             text = input.value
         )
     }

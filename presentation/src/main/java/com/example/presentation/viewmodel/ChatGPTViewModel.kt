@@ -9,6 +9,7 @@ import com.aallam.openai.api.chat.ChatCompletionChunk
 import com.example.domain.usecase.SendChatUseCase
 import com.example.presentation.state.GptState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,21 +32,23 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     val inputChange: (String) -> Unit = {
         input.value = it
     }
-    val onReset: (GptState) -> Unit = {
-        _gptSate.value = GptState.End
-    }
 
-    fun sendChat(chat: String) = viewModelScope.launch {
+    private fun sendChat(chat: String) = viewModelScope.launch {
         val flow = flow {
             sendChatUseCase.invoke(chat).catch {
-                Log.e("it","${it.message}")
+                Log.e("it", "${it.message}")
                 gptState.value = GptState.Error(it)
             }.collect {
                 emit(it)
             }
         }
         flow.collect {
+            Log.e("it", "${it}")
             chatResult.value += it.choices[0].delta?.content ?: ""
+            if (it.choices[0].finishReason == "stop") {
+                gptState.value = GptState.End(it)
+                return@collect
+            }
             gptState.value = GptState.LoadChat(it)
         }
     }
