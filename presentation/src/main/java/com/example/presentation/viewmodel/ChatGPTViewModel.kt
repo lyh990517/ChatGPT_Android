@@ -22,9 +22,10 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     val gptState = _gptSate
 
     val input = mutableStateOf("")
-    val chat = MutableStateFlow("")
+    val chatResult = MutableStateFlow("")
 
     val onSend: (String) -> Unit = {
+        input.value = ""
         sendChat(it)
     }
     val inputChange: (String) -> Unit = {
@@ -34,14 +35,18 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
         _gptSate.value = GptState.End
     }
 
-    private fun sendChat(chat: String) = viewModelScope.launch {
+    fun sendChat(chat: String) = viewModelScope.launch {
         val flow = flow {
             sendChatUseCase.invoke(chat).catch {
+                Log.e("it","${it.message}")
                 gptState.value = GptState.Error(it)
             }.collect {
                 emit(it)
             }
         }
-        gptState.value = GptState.Success(flow)
+        flow.collect {
+            chatResult.value += it.choices[0].delta?.content ?: ""
+            gptState.value = GptState.LoadChat(it)
+        }
     }
 }

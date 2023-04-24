@@ -25,18 +25,12 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val scrollState = rememberScrollState()
     val state = gptViewModel.gptState.collectAsState()
-    Log.e("compose","ChatScreen")
+    Log.e("compose", "ChatScreen")
     LaunchedEffect(state.value) {
         when (state.value) {
-            is GptState.Success -> {
-                val data = state.value as GptState.Success
-                data.chatData.collect {
-                    gptViewModel.chat.value += it.choices[0].delta?.content ?: ""
-                    scrollState.animateScrollTo(scrollState.maxValue)
-                }
-            }
+            is GptState.LoadChat -> scrollState.animateScrollTo(scrollState.maxValue)
             is GptState.End -> {
-                gptViewModel.chat.value = ""
+
             }
             is GptState.Error -> {
 
@@ -80,7 +74,7 @@ private fun InputStateLess(
     onReset: (GptState) -> Unit,
     text: String
 ) {
-    Log.e("compose","InputStateLess")
+    Log.e("compose", "InputStateLess")
     Row {
         TextField(
             value = text,
@@ -116,6 +110,6 @@ private fun Input(
 private fun Chat(
     gptViewModel: ChatGPTViewModel,
 ) {
-    Log.e("compose","Chat")
-    Text(text = gptViewModel.chat.collectAsState().value, fontSize = 18.sp)
+    Log.e("compose", "Chat")
+    Text(text = gptViewModel.chatResult.collectAsState().value, fontSize = 18.sp)
 }
