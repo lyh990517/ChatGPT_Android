@@ -4,7 +4,6 @@ package com.example.feature_chat
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +23,26 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val scrollState = rememberScrollState()
+    val state = gptViewModel.gptState.collectAsState()
+    LaunchedEffect(state.value) {
+        Log.e("launch","${state.value}")
+        when (state.value) {
+            is GptState.Success -> {
+                val data = state.value as GptState.Success
+                data.chatData.collect {
+                    gptViewModel.chat.value += it.choices[0].delta?.content ?: ""
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
+            }
+            is GptState.End -> {
+                gptViewModel.chat.value = ""
+            }
+            is GptState.Error -> {
+
+            }
+            else -> {}
+        }
+    }
     Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
         Column(
             Modifier
@@ -33,7 +52,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
                 .weight(5f)
                 .verticalScroll(scrollState)
         ) {
-            Chat(gptViewModel.gptState.collectAsState().value, scrollState)
+            Chat(gptViewModel.chat.collectAsState().value)
         }
         Input(
             inputChange = {
@@ -79,27 +98,7 @@ private fun Input(
 
 @Composable
 private fun Chat(
-    state: GptState,
-    scrollState: ScrollState
+    text: String,
 ) {
-    val chat = remember(state) { mutableStateOf("") }
-    when (state) {
-        is GptState.Success -> {
-            val data = state as GptState.Success
-            LaunchedEffect(Unit) {
-                data.chatData.collect {
-                    chat.value += it.choices[0].delta?.content ?: ""
-                    scrollState.animateScrollTo(scrollState.maxValue)
-                }
-            }
-        }
-        is GptState.End -> {
-        }
-        is GptState.Error -> {
-            val data = state as GptState.Error
-            Log.e("error", "$data")
-        }
-        else -> {}
-    }
-    Text(text = chat.value, fontSize = 18.sp)
+    Text(text = text, fontSize = 18.sp)
 }
