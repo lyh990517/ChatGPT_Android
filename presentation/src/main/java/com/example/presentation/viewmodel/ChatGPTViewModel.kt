@@ -1,6 +1,7 @@
 package com.example.presentation.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aallam.openai.api.BetaOpenAI
@@ -19,6 +20,9 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     ViewModel() {
     private val _gptSate = MutableStateFlow<GptState>(GptState.Loading)
     val gptState = _gptSate
+
+    val input = mutableStateOf("")
+
     fun sendChat(chat: String) = viewModelScope.launch {
         Log.e("chat", chat)
         val flow = flow {

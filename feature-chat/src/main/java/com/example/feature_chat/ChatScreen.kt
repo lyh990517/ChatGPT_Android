@@ -5,18 +5,14 @@ package com.example.feature_chat
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,7 +23,6 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
-    val state = gptViewModel.gptState.collectAsState()
     val scrollState = rememberScrollState()
     Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
         Column(
@@ -38,9 +33,20 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
                 .weight(5f)
                 .verticalScroll(scrollState)
         ) {
-            Chat(state, scrollState)
+            Chat(gptViewModel.gptState.collectAsState().value, scrollState)
         }
-        Input(gptViewModel, Modifier)
+        Input(
+            inputChange = {
+                gptViewModel.input.value = it
+            },
+            onSend = {
+                gptViewModel.sendChat(it)
+            },
+            onReset = {
+                gptViewModel.gptState.value = it
+            },
+            text = gptViewModel.input.value
+        )
     }
     BackHandler {
         navigator.popBackStack()
@@ -48,23 +54,24 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 }
 
 @Composable
-private fun Input(viewModel: ChatGPTViewModel, modifier: Modifier) {
-    val input = remember {
-        mutableStateOf("")
-    }
-    Row(modifier) {
+private fun Input(
+    inputChange: (String) -> Unit,
+    onSend: (String) -> Unit,
+    onReset: (GptState) -> Unit,
+    text: String
+) {
+    Row {
         TextField(
-            value = input.value,
-            onValueChange = { input.value = it },
+            value = text,
+            onValueChange = inputChange,
             modifier = Modifier.weight(1f)
         )
         Button(onClick = {
-            viewModel.sendChat(input.value)
-            input.value = ""
+            onSend(text)
         }) {
             Text(text = "send")
         }
-        Button(onClick = { viewModel.gptState.value = GptState.End }) {
+        Button(onClick = { onReset(GptState.End) }) {
             Text(text = "reset")
         }
     }
@@ -72,13 +79,13 @@ private fun Input(viewModel: ChatGPTViewModel, modifier: Modifier) {
 
 @Composable
 private fun Chat(
-    state: State<GptState>,
+    state: GptState,
     scrollState: ScrollState
 ) {
-    val chat = remember(state.value) { mutableStateOf("") }
-    when (state.value) {
+    val chat = remember(state) { mutableStateOf("") }
+    when (state) {
         is GptState.Success -> {
-            val data = state.value as GptState.Success
+            val data = state as GptState.Success
             LaunchedEffect(Unit) {
                 data.chatData.collect {
                     chat.value += it.choices[0].delta?.content ?: ""
@@ -89,7 +96,7 @@ private fun Chat(
         is GptState.End -> {
         }
         is GptState.Error -> {
-            val data = state.value as GptState.Error
+            val data = state as GptState.Error
             Log.e("error", "$data")
         }
         else -> {}
