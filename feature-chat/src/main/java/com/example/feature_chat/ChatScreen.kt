@@ -54,6 +54,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             }
             is GptState.End -> {
                 isGenerating.value = false
+                gptViewModel.gptState.value = GptState.Idle
             }
             is GptState.Error -> {
 
@@ -70,7 +71,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
         },
         onScroll = {
             scope.launch {
-                lazyColumnState.animateScrollToItem(gptViewModel.chatList.size)
+                if(gptViewModel.gptState.value != GptState.Idle) lazyColumnState.animateScrollToItem(gptViewModel.chatList.size)
             }
         }, lazyListState = lazyColumnState
     )
