@@ -30,6 +30,7 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     val onSend: (String) -> Unit = {
         input.value = ""
         chatList.add(ChatUiModel(it,isUser = true))
+        _gptState.value = GptState.LoadChat
         sendChat(it)
     }
     val inputChange: (String) -> Unit = {

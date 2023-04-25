@@ -11,13 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -169,16 +167,29 @@ private fun Input(
     text: String,
 ) {
     Log.e("compose", "InputStateLess")
-    Row {
-        TextField(
+    Box(Modifier.wrapContentHeight()) {
+        OutlinedTextField(
             value = text,
             onValueChange = inputChange,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text(text = "Message")
+            },
+            enabled = !isGenerating
         )
-        Button(onClick = {
-            onSend(text)
-        }, enabled = !isGenerating) {
-            Text(text = "send")
+        IconButton(
+            modifier = Modifier
+                .wrapContentHeight()
+                .size(50.dp)
+                .align(Alignment.CenterEnd), onClick = {
+                onSend(text)
+            }, enabled = !isGenerating
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Send,
+                contentDescription = "Send",
+                Modifier.focusable(true)
+            )
         }
     }
 }
@@ -237,4 +248,15 @@ private fun Chat(
 @Composable
 fun ChatPreview() {
     Chat("hello?", isUser = true) {}
+}
+
+@Preview
+@Composable
+fun InputPreview() {
+    Input(
+        inputChange = {},
+        onSend = {},
+        text = "",
+        isGenerating = false
+    )
 }
