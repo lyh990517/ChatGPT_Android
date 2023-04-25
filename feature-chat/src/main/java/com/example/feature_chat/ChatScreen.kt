@@ -17,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,7 +52,8 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             else -> {}
         }
     }
-    ChatContent(gptViewModel, scrollState, isGenerating = isGenerating.value,
+    ChatContent(
+        gptViewModel, scrollState, isGenerating = isGenerating.value,
         onChange = {
             scope.launch {
                 scrollState.animateScrollTo(scrollState.maxValue)
@@ -93,7 +95,7 @@ private fun ChatContent(
                             .weight(5f)
                             .verticalScroll(scrollState)
                     ) {
-                        Chat(gptViewModel, onChange = onChange)
+                        Chat(gptViewModel.chatResult.collectAsState().value, onChange = onChange)
                     }
                     Input(gptViewModel)
                 }
@@ -113,7 +115,7 @@ private fun ChatContent(
                             .fillMaxHeight()
                     ) {
                         items(gptViewModel.chatList) {
-                            Text(text = it.chat, fontSize = 18.sp)
+                            Chat(text = it.chat, onScroll)
                         }
                     }
                     Input(gptViewModel)
@@ -159,10 +161,18 @@ private fun Input(
 
 @Composable
 private fun Chat(
-    gptViewModel: ChatGPTViewModel,
+    text: String,
     onChange: () -> Unit
 ) {
     Log.e("compose", "Chat")
-    Text(text = gptViewModel.chatResult.collectAsState().value, fontSize = 18.sp)
+    Text(text = text, fontSize = 18.sp)
     onChange()
+}
+
+@Preview
+@Composable
+fun ChatPreview() {
+    Chat("hello?") {
+
+    }
 }
