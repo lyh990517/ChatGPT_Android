@@ -1,12 +1,9 @@
-@file:OptIn(BetaOpenAI::class)
-
 package com.example.feature_chat
 
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.*
@@ -33,14 +30,12 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.aallam.openai.api.BetaOpenAI
 import com.example.presentation.state.GptState
 import com.example.presentation.viewmodel.ChatGPTViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun ChatScreen(
-    context: Context,
     navigator: NavHostController,
     gptViewModel: ChatGPTViewModel = hiltViewModel()
 ) {
@@ -71,7 +66,6 @@ fun ChatScreen(
         }
     }
     ChatContent(
-        context,
         gptViewModel, scrollState, isGenerating = isGenerating.value,
         onChange = {
             scope.launch {
@@ -86,7 +80,6 @@ fun ChatScreen(
 
 @Composable
 private fun ChatContent(
-    context: Context,
     gptViewModel: ChatGPTViewModel,
     scrollState: ScrollState,
     isGenerating: Boolean,
@@ -95,15 +88,14 @@ private fun ChatContent(
     Log.e("compose", "ChatContent")
     Crossfade(targetState = isGenerating) { state ->
         when (state) {
-            true -> OnCreateChat(context,scrollState, gptViewModel, onChange, isGenerating = isGenerating)
-            false -> ChatList(gptViewModel = gptViewModel, isGenerating = isGenerating, context = context)
+            true -> OnCreateChat(scrollState, gptViewModel, onChange, isGenerating = isGenerating)
+            false -> ChatList(gptViewModel = gptViewModel, isGenerating = isGenerating)
         }
     }
 }
 
 @Composable
 private fun ChatList(
-    context: Context,
     gptViewModel: ChatGPTViewModel,
     isGenerating: Boolean
 ) {
@@ -119,7 +111,7 @@ private fun ChatList(
                 .fillMaxHeight()
         ) {
             items(gptViewModel.chatList) {
-                Chat(text = it.chat, isUser = it.isUser, context = context)
+                Chat(text = it.chat, isUser = it.isUser)
             }
         }
         Input(
@@ -133,7 +125,6 @@ private fun ChatList(
 
 @Composable
 private fun OnCreateChat(
-    context: Context,
     scrollState: ScrollState,
     gptViewModel: ChatGPTViewModel,
     onChange: () -> Unit,
@@ -151,7 +142,6 @@ private fun OnCreateChat(
                 .verticalScroll(scrollState)
         ) {
             Chat(
-                context,
                 gptViewModel.chatResult.collectAsState().value,
                 onChange = onChange,
                 isUser = false
@@ -203,7 +193,6 @@ private fun Input(
 
 @Composable
 private fun Chat(
-    context: Context,
     text: String,
     isUser: Boolean,
     onChange: () -> Unit = {}
@@ -247,7 +236,6 @@ private fun Chat(
             modifier = Modifier
                 .clickable {
                     clipboardManager.setPrimaryClip(clipData)
-                    Toast.makeText(context, "복사되었습니다.", Toast.LENGTH_SHORT).show()
                 }
                 .constrainAs(copy) {
                     end.linkTo(chat.end)
@@ -269,7 +257,7 @@ private fun Chat(
 @Preview
 @Composable
 fun ChatPreview() {
-    Chat(context = LocalContext.current,"hello?", isUser = true) {}
+    Chat("hello?", isUser = true) {}
 }
 
 @Preview
