@@ -54,7 +54,6 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
             _gptState.value = GptState.LoadChat
             chatResult.value += it.choices[0].delta?.content ?: ""
             if (it.choices[0].finishReason == "stop") {
-                delay(2000)
                 _gptState.value = GptState.End(it)
                 onSubmit(chatResult.value)
                 return@collect

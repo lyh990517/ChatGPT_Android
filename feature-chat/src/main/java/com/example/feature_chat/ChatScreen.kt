@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -217,15 +218,16 @@ private fun Chat(
                 .background(profileBackGround)
                 .clip(RoundedCornerShape(10.dp))
         )
-        Text(text = text, modifier = Modifier
+        SelectionContainer(modifier = Modifier
             .constrainAs(chat) {
                 start.linkTo(profile.end, margin = 10.dp)
                 top.linkTo(profile.top, margin = 10.dp)
                 end.linkTo(parent.end, margin = 20.dp)
                 width = Dimension.fillToConstraints
             }
-            .padding(bottom = 40.dp), fontSize = 14.sp)
-
+            .padding(bottom = 40.dp)) {
+            Text(text = text, fontSize = 16.sp)
+        }
         Spacer(modifier = Modifier
             .fillMaxWidth()
             .height(1.dp)
