@@ -34,15 +34,10 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     }
 
     private fun sendChat(chat: String) = viewModelScope.launch {
-        val flow = flow {
-            sendChatUseCase.invoke(chat).catch {
-                chatResult.value += it.message
-                gptState.value = GptState.Error(it)
-            }.collect {
-                emit(it)
-            }
-        }
-        flow.collect {
+        sendChatUseCase.invoke(chat).catch {
+            chatResult.value += it.message
+            gptState.value = GptState.Error(it)
+        }.collect {
             chatResult.value += it.choices[0].delta?.content ?: ""
             if (it.choices[0].finishReason == "stop") {
                 gptState.value = GptState.End(it)
@@ -51,7 +46,8 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
             gptState.value = GptState.LoadChat(it)
         }
     }
-    fun chatGenerationEnd(){
+
+    fun chatGenerationEnd() {
         chatResult.value += "\n \n \n"
     }
 }
