@@ -43,6 +43,12 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
     Log.e("compose", "ChatScreen")
     LaunchedEffect(state.value) {
         when (state.value) {
+            is GptState.Idle -> {
+
+            }
+            is GptState.Loading -> {
+                isGenerating.value = true
+            }
             is GptState.LoadChat -> {
                 isGenerating.value = true
             }
@@ -50,9 +56,6 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
                 isGenerating.value = false
             }
             is GptState.Error -> {
-
-            }
-            is GptState.Loading -> {
 
             }
             else -> {}

@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChatUseCase) :
     ViewModel() {
-    private val _gptState = MutableStateFlow<GptState>(GptState.Loading)
+    private val _gptState = MutableStateFlow<GptState>(GptState.Idle)
     val gptState = _gptState
 
     val input = mutableStateOf("")
@@ -30,7 +30,8 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
     val onSend: (String) -> Unit = {
         input.value = ""
         chatList.add(ChatUiModel(it,isUser = true))
-        _gptState.value = GptState.LoadChat
+        chatResult.value = "Loading..."
+        _gptState.value = GptState.Loading
         sendChat(it)
     }
     val inputChange: (String) -> Unit = {
@@ -49,13 +50,15 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
             chatResult.value += it.message
             _gptState.value = GptState.Error(it)
         }.collect {
+            if(_gptState.value == GptState.Loading) chatResult.value = ""
+            _gptState.value = GptState.LoadChat
             chatResult.value += it.choices[0].delta?.content ?: ""
             if (it.choices[0].finishReason == "stop") {
+                delay(2000)
                 _gptState.value = GptState.End(it)
                 onSubmit(chatResult.value)
                 return@collect
             }
-            _gptState.value = GptState.LoadChat
         }
     }
 

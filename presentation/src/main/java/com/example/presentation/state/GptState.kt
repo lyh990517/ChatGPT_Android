@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(BetaOpenAI::class)
 sealed class GptState {
+    object Idle : GptState()
+
     object Loading : GptState()
 
     object LoadChat : GptState()
