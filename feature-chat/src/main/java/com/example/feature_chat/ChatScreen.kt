@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val state = gptViewModel.gptState.collectAsState()
     val scrollState = rememberScrollState()
-    val lazyColumnState = LazyListState()
     val scope = rememberCoroutineScope()
     val isGenerating = remember { mutableStateOf(false) }
     Log.e("compose", "ChatScreen")
@@ -68,12 +67,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             scope.launch {
                 scrollState.animateScrollTo(scrollState.maxValue)
             }
-        },
-        onScroll = {
-            scope.launch {
-                if(gptViewModel.gptState.value != GptState.Idle) lazyColumnState.animateScrollToItem(gptViewModel.chatList.size)
-            }
-        }, lazyListState = lazyColumnState
+        }
     )
     BackHandler {
         navigator.popBackStack()
@@ -84,41 +78,36 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 private fun ChatContent(
     gptViewModel: ChatGPTViewModel,
     scrollState: ScrollState,
-    lazyListState: LazyListState,
     isGenerating: Boolean,
     onChange: () -> Unit,
-    onScroll: () -> Unit
 ) {
     Log.e("compose", "ChatContent")
     Crossfade(targetState = isGenerating) { state ->
         when (state) {
             true -> OnCreateChat(scrollState, gptViewModel, onChange, isGenerating = isGenerating)
-            false -> ChatList(onScroll, lazyListState, gptViewModel, isGenerating = isGenerating)
+            false -> ChatList(gptViewModel = gptViewModel, isGenerating = isGenerating)
         }
     }
 }
 
 @Composable
 private fun ChatList(
-    onScroll: () -> Unit,
-    lazyListState: LazyListState,
     gptViewModel: ChatGPTViewModel,
     isGenerating: Boolean
 ) {
-    onScroll()
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxHeight()
     ) {
         LazyColumn(
-            state = lazyListState,
+            state = LazyListState(firstVisibleItemIndex = gptViewModel.chatList.size),
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .fillMaxHeight()
         ) {
             items(gptViewModel.chatList) {
-                Chat(text = it.chat, isUser = it.isUser, onScroll)
+                Chat(text = it.chat, isUser = it.isUser)
             }
         }
         Input(
@@ -202,7 +191,7 @@ private fun Input(
 private fun Chat(
     text: String,
     isUser: Boolean,
-    onChange: () -> Unit
+    onChange: () -> Unit = {}
 ) {
     Log.e("compose", "Chat")
     val color =
