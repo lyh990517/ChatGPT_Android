@@ -70,7 +70,10 @@ private fun ChatContent(
     Crossfade(targetState = isGenerating) { state ->
         when (state) {
             true -> {
-                Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
                     Column(
                         Modifier
                             .padding(20.dp)
@@ -79,19 +82,22 @@ private fun ChatContent(
                             .weight(5f)
                             .verticalScroll(scrollState)
                     ) {
-                        Chat(gptViewModel,onChange = onChange)
+                        Chat(gptViewModel, onChange = onChange)
                     }
-                    Input(gptViewModel,Modifier)
+                    Input(gptViewModel, Modifier)
                 }
             }
             false -> {
-                Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
-                    LazyColumn {
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    LazyColumn(Modifier.weight(1f)) {
                         items(gptViewModel.chatList) {
                             Text(text = it.chat)
                         }
                     }
-                    Input(gptViewModel,Modifier)
+                    Input(gptViewModel, Modifier.weight(1f))
                 }
             }
         }

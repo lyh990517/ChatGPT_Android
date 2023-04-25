@@ -18,7 +18,7 @@ object GPTModule {
     @Provides
     fun provideOpenAI(): OpenAI = OpenAI(
         OpenAIConfig(
-            token = "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",
+            token = "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",
             timeout = Timeout(socket = 600.seconds)
         )
     )
