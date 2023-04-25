@@ -4,8 +4,11 @@ package com.example.feature_chat
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -27,10 +30,16 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
     val state = gptViewModel.gptState.collectAsState()
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
+    val isGenerating = remember { mutableStateOf(false) }
     Log.e("compose", "ChatScreen")
     LaunchedEffect(state.value) {
         when (state.value) {
-            is GptState.End -> gptViewModel.chatGenerationEnd()
+            is GptState.LoadChat -> {
+                isGenerating.value = true
+            }
+            is GptState.End -> {
+                isGenerating.value = false
+            }
             is GptState.Error -> {
 
             }
@@ -40,7 +49,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             else -> {}
         }
     }
-    ChatContent(gptViewModel,scrollState){
+    ChatContent(gptViewModel, scrollState, isGenerating.value) {
         scope.launch {
             scrollState.animateScrollTo(scrollState.maxValue)
         }
@@ -54,22 +63,38 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 private fun ChatContent(
     gptViewModel: ChatGPTViewModel,
     scrollState: ScrollState,
+    isGenerating: Boolean,
     onChange: () -> Unit
 ) {
     Log.e("compose", "ChatContent")
-    val scope = rememberCoroutineScope()
-    Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
-        Column(
-            Modifier
-                .padding(20.dp)
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .weight(5f)
-                .verticalScroll(scrollState)
-        ) {
-            Chat(gptViewModel,onChange = onChange)
+    Crossfade(targetState = isGenerating) { state ->
+        when (state) {
+            true -> {
+                Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
+                    Column(
+                        Modifier
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .weight(5f)
+                            .verticalScroll(scrollState)
+                    ) {
+                        Chat(gptViewModel,onChange = onChange)
+                    }
+                    Input(gptViewModel,Modifier)
+                }
+            }
+            false -> {
+                Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
+                    LazyColumn {
+                        items(gptViewModel.chatList) {
+                            Text(text = it.chat)
+                        }
+                    }
+                    Input(gptViewModel,Modifier)
+                }
+            }
         }
-        Input(gptViewModel)
     }
 }
 
@@ -77,7 +102,8 @@ private fun ChatContent(
 private fun InputStateLess(
     inputChange: (String) -> Unit,
     onSend: (String) -> Unit,
-    text: String
+    text: String,
+    modifier: Modifier
 ) {
     Log.e("compose", "InputStateLess")
     Row {
@@ -96,13 +122,15 @@ private fun InputStateLess(
 
 @Composable
 private fun Input(
-    gptViewModel: ChatGPTViewModel
+    gptViewModel: ChatGPTViewModel,
+    modifier: Modifier
 ) {
     with(gptViewModel) {
         InputStateLess(
             inputChange = inputChange,
             onSend = onSend,
-            text = input.value
+            text = input.value,
+            modifier = modifier
         )
     }
 }
@@ -110,7 +138,7 @@ private fun Input(
 @Composable
 private fun Chat(
     gptViewModel: ChatGPTViewModel,
-    onChange:() -> Unit
+    onChange: () -> Unit
 ) {
     Log.e("compose", "Chat")
     Text(text = gptViewModel.chatResult.collectAsState().value, fontSize = 18.sp)
