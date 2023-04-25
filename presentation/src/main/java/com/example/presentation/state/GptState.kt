@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.Flow
 sealed class GptState {
     object Loading : GptState()
 
-    data class LoadChat(val data: ChatCompletionChunk) : GptState()
-
     data class Error(val t: Throwable) : GptState()
 
     data class End(val data: ChatCompletionChunk) : GptState()

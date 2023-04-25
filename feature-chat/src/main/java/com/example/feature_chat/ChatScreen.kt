@@ -20,10 +20,13 @@ import androidx.navigation.NavHostController
 import com.aallam.openai.api.BetaOpenAI
 import com.example.presentation.state.GptState
 import com.example.presentation.viewmodel.ChatGPTViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val state = gptViewModel.gptState.collectAsState()
+    val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     Log.e("compose", "ChatScreen")
     LaunchedEffect(state.value) {
         when (state.value) {
@@ -37,7 +40,11 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             else -> {}
         }
     }
-    ChatContent(gptViewModel)
+    ChatContent(gptViewModel,scrollState){
+        scope.launch {
+            scrollState.animateScrollTo(scrollState.maxValue)
+        }
+    }
     BackHandler {
         navigator.popBackStack()
     }
@@ -45,9 +52,12 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 
 @Composable
 private fun ChatContent(
-    gptViewModel: ChatGPTViewModel
+    gptViewModel: ChatGPTViewModel,
+    scrollState: ScrollState,
+    onChange: () -> Unit
 ) {
-    val scrollState = rememberScrollState()
+    Log.e("compose", "ChatContent")
+    val scope = rememberCoroutineScope()
     Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
         Column(
             Modifier
@@ -57,7 +67,7 @@ private fun ChatContent(
                 .weight(5f)
                 .verticalScroll(scrollState)
         ) {
-            Chat(gptViewModel)
+            Chat(gptViewModel,onChange = onChange)
         }
         Input(gptViewModel)
     }
@@ -100,7 +110,9 @@ private fun Input(
 @Composable
 private fun Chat(
     gptViewModel: ChatGPTViewModel,
+    onChange:() -> Unit
 ) {
     Log.e("compose", "Chat")
     Text(text = gptViewModel.chatResult.collectAsState().value, fontSize = 18.sp)
+    onChange()
 }
