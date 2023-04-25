@@ -43,7 +43,6 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
                 gptState.value = GptState.End(it)
                 return@collect
             }
-            gptState.value = GptState.LoadChat(it)
         }
     }
 

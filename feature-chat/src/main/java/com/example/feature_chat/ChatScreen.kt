@@ -23,12 +23,10 @@ import com.example.presentation.viewmodel.ChatGPTViewModel
 
 @Composable
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
-    val scrollState = rememberScrollState()
     val state = gptViewModel.gptState.collectAsState()
     Log.e("compose", "ChatScreen")
     LaunchedEffect(state.value) {
         when (state.value) {
-            is GptState.LoadChat -> scrollState.animateScrollTo(scrollState.maxValue)
             is GptState.End -> gptViewModel.chatGenerationEnd()
             is GptState.Error -> {
 
@@ -39,7 +37,7 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             else -> {}
         }
     }
-    ChatContent(scrollState, gptViewModel)
+    ChatContent(gptViewModel)
     BackHandler {
         navigator.popBackStack()
     }
@@ -47,9 +45,9 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 
 @Composable
 private fun ChatContent(
-    scrollState: ScrollState,
     gptViewModel: ChatGPTViewModel
 ) {
+    val scrollState = rememberScrollState()
     Column(verticalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxHeight()) {
         Column(
             Modifier
