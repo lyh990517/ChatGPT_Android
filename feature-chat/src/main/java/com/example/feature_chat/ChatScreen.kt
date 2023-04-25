@@ -209,13 +209,10 @@ private fun Chat(
     onChange: () -> Unit = {}
 ) {
     Log.e("compose", "Chat")
-    val clipboardManager =
-        LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clipData = ClipData.newPlainText("text", text)
-    val color =
-        if (!isUser) Color(LocalContext.current.getColor(R.color.chat_back)) else Color.White
-    val icon =
-        if (!isUser) painterResource(id = R.drawable.gpt_icon) else painterResource(id = R.drawable.baseline_person_24)
+    val color = if (!isUser) Color(LocalContext.current.getColor(R.color.chat_back)) else Color.White
+    val icon = if (!isUser) painterResource(id = R.drawable.gpt_icon) else painterResource(id = R.drawable.baseline_person_24)
     val profileBackGround = Color(LocalContext.current.getColor(R.color.chat_back))
     ConstraintLayout(
         modifier = Modifier
