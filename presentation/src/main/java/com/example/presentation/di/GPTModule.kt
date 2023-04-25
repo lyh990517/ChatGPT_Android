@@ -3,6 +3,7 @@ package com.example.presentation.di
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIConfig
+import com.example.presentation.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +19,7 @@ object GPTModule {
     @Provides
     fun provideOpenAI(): OpenAI = OpenAI(
         OpenAIConfig(
-            token = "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",
+            token = BuildConfig.GPT_KEY,
             timeout = Timeout(socket = 600.seconds)
         )
     )
