@@ -43,11 +43,10 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
 
     private fun sendChat(chat: String) = viewModelScope.launch {
         sendChatUseCase.invoke(chat).catch {
-            Log.e("it", "${it.message}")
+            Log.e("error", "${it.message}")
             chatResult.value += it.message
             _gptState.value = GptState.Error(it)
         }.collect {
-            Log.e("it", "$it")
             chatResult.value += it.choices[0].delta?.content ?: ""
             if (it.choices[0].finishReason == "stop") {
                 _gptState.value = GptState.End(it)
@@ -58,7 +57,4 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
         }
     }
 
-    fun chatGenerationEnd() {
-        chatResult.value += "\n \n \n"
-    }
 }

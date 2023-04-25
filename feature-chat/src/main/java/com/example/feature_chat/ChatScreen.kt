@@ -8,6 +8,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hiltViewModel()) {
     val state = gptViewModel.gptState.collectAsState()
     val scrollState = rememberScrollState()
+    val lazyColumnState = LazyListState()
     val scope = rememberCoroutineScope()
     val isGenerating = remember { mutableStateOf(false) }
     Log.e("compose", "ChatScreen")
@@ -49,11 +51,18 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
             else -> {}
         }
     }
-    ChatContent(gptViewModel, scrollState, isGenerating.value) {
-        scope.launch {
-            scrollState.animateScrollTo(scrollState.maxValue)
-        }
-    }
+    ChatContent(gptViewModel, scrollState, isGenerating = isGenerating.value,
+        onChange = {
+            scope.launch {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+        },
+        onScroll = {
+            scope.launch {
+                lazyColumnState.animateScrollToItem(gptViewModel.chatList.size)
+            }
+        }, lazyListState = lazyColumnState
+    )
     BackHandler {
         navigator.popBackStack()
     }
@@ -63,8 +72,10 @@ fun ChatScreen(navigator: NavHostController, gptViewModel: ChatGPTViewModel = hi
 private fun ChatContent(
     gptViewModel: ChatGPTViewModel,
     scrollState: ScrollState,
+    lazyListState: LazyListState,
     isGenerating: Boolean,
-    onChange: () -> Unit
+    onChange: () -> Unit,
+    onScroll: () -> Unit
 ) {
     Log.e("compose", "ChatContent")
     Crossfade(targetState = isGenerating) { state ->
@@ -84,20 +95,28 @@ private fun ChatContent(
                     ) {
                         Chat(gptViewModel, onChange = onChange)
                     }
-                    Input(gptViewModel, Modifier)
+                    Input(gptViewModel)
                 }
             }
             false -> {
+                onScroll()
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxHeight()
                 ) {
-                    LazyColumn(Modifier.weight(1f)) {
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(20.dp)
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                    ) {
                         items(gptViewModel.chatList) {
-                            Text(text = it.chat)
+                            Text(text = it.chat, fontSize = 18.sp)
                         }
                     }
-                    Input(gptViewModel, Modifier.weight(1f))
+                    Input(gptViewModel)
                 }
             }
         }
@@ -109,7 +128,6 @@ private fun InputStateLess(
     inputChange: (String) -> Unit,
     onSend: (String) -> Unit,
     text: String,
-    modifier: Modifier
 ) {
     Log.e("compose", "InputStateLess")
     Row {
@@ -129,14 +147,12 @@ private fun InputStateLess(
 @Composable
 private fun Input(
     gptViewModel: ChatGPTViewModel,
-    modifier: Modifier
 ) {
     with(gptViewModel) {
         InputStateLess(
             inputChange = inputChange,
             onSend = onSend,
             text = input.value,
-            modifier = modifier
         )
     }
 }
