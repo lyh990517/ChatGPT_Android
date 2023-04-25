@@ -82,51 +82,73 @@ private fun ChatContent(
     Log.e("compose", "ChatContent")
     Crossfade(targetState = isGenerating) { state ->
         when (state) {
-            true -> {
-                Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxHeight()
-                ) {
-                    Column(
-                        Modifier
-                            .padding(20.dp)
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .weight(5f)
-                            .verticalScroll(scrollState)
-                    ) {
-                        Chat(gptViewModel.chatResult.collectAsState().value, onChange = onChange)
-                    }
-                    Input(gptViewModel)
-                }
-            }
-            false -> {
-                onScroll()
-                Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxHeight()
-                ) {
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(20.dp)
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                    ) {
-                        items(gptViewModel.chatList) {
-                            Chat(text = it.chat, onScroll)
-                        }
-                    }
-                    Input(gptViewModel)
-                }
-            }
+            true -> OnCreateChat(scrollState, gptViewModel, onChange)
+            false -> ChatList(onScroll, lazyListState, gptViewModel)
         }
     }
 }
 
 @Composable
-private fun InputStateLess(
+private fun ChatList(
+    onScroll: () -> Unit,
+    lazyListState: LazyListState,
+    gptViewModel: ChatGPTViewModel
+) {
+    onScroll()
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxHeight()
+    ) {
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier
+                .weight(1f)
+                .padding(20.dp)
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            items(gptViewModel.chatList) {
+                Chat(text = it.chat, onScroll)
+            }
+        }
+        Input(
+            inputChange = gptViewModel.inputChange,
+            onSend = gptViewModel.onSend,
+            text = gptViewModel.input.value,
+        )
+    }
+}
+
+@Composable
+private fun OnCreateChat(
+    scrollState: ScrollState,
+    gptViewModel: ChatGPTViewModel,
+    onChange: () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxHeight()
+    ) {
+        Column(
+            Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .weight(5f)
+                .verticalScroll(scrollState)
+        ) {
+            Chat(gptViewModel.chatResult.collectAsState().value, onChange = onChange)
+        }
+        Input(
+            inputChange = gptViewModel.inputChange,
+            onSend = gptViewModel.onSend,
+            text = gptViewModel.input.value,
+        )
+    }
+}
+
+@Composable
+private fun Input(
     inputChange: (String) -> Unit,
     onSend: (String) -> Unit,
     text: String,
@@ -143,19 +165,6 @@ private fun InputStateLess(
         }) {
             Text(text = "send")
         }
-    }
-}
-
-@Composable
-private fun Input(
-    gptViewModel: ChatGPTViewModel,
-) {
-    with(gptViewModel) {
-        InputStateLess(
-            inputChange = inputChange,
-            onSend = onSend,
-            text = input.value,
-        )
     }
 }
 
