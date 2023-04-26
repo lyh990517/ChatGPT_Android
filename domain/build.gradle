@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.domain'
+    namespace 'hello.yunho.domain'
     compileSdk 33
 
     defaultConfig {

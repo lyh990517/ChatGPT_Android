@@ -9,7 +9,7 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
-    namespace 'com.example.presentation'
+    namespace 'hello.yunho.presentation'
     compileSdk 33
 
     defaultConfig {

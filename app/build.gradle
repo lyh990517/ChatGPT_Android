@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.chatgpt'
+    namespace 'hello.yunho.chatgpt'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.chatgpt"
+        applicationId "hello.yunho.chatgpt"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -28,6 +28,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "version"
+    productFlavors {
+        free {
+            dimension "version"
+            manifestPlaceholders = [
+                    appLabel: "Free-Flavor"
+            ]
+            applicationIdSuffix ".free"
+            versionCode 10000
+            versionName "1.0.0"
+            buildConfigField "String", "EXPLAIN", "\"This is FREE-FLAVOR application\""
+            resValue "string", "appName", "Free-Flavor"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

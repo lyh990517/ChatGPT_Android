@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.feature_chat'
+    namespace 'hello.yunho.feature_chat'
     compileSdk 33
 
     defaultConfig {
