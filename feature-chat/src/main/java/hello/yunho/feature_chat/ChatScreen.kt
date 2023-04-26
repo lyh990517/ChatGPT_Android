@@ -30,7 +30,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.feature_chat.R
 import hello.yunho.presentation.state.GptState
 import hello.yunho.presentation.viewmodel.ChatGPTViewModel
 import kotlinx.coroutines.launch
