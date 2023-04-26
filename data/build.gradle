@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.chatgpt'
+    namespace 'com.example.data'
     compileSdk 33
 
     defaultConfig {

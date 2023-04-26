@@ -10,9 +10,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/ChatGPT" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/chat" />
+            <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/feature-chat" />
             <option value="$PROJECT_DIR$/presentation" />

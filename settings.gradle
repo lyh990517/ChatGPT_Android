@@ -14,7 +14,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "chatGPT"
 include ':app'
-include ':ChatGPT'
+include ':data'
 include ':domain'
 include ':presentation'
 include ':chat'
