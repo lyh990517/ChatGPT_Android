@@ -38,6 +38,7 @@ import coil.request.ImageRequest
 import com.aallam.openai.api.BetaOpenAI
 import hello.yunho.presentation.state.ImageState
 import hello.yunho.presentation.viewmodel.ImageViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(BetaOpenAI::class)
@@ -47,8 +48,8 @@ fun ImageCreationScreen(
     navigator: NavHostController,
 ) {
     val viewModel: ImageViewModel = hiltViewModel()
-    Text(text = "Creation")
     val state = viewModel.uiState.collectAsState()
+    val scope = rememberCoroutineScope()
     LaunchedEffect(state.value) {
         when (state.value) {
             is ImageState.Idle -> {}
@@ -60,25 +61,14 @@ fun ImageCreationScreen(
             else -> {}
         }
     }
-    ImageContent(viewModel,context)
+    ImageContent(viewModel, scope, context)
     BackHandler {
         navigator.popBackStack()
     }
 }
 
 @Composable
-fun ImageContent(viewModel: ImageViewModel,context: Context) {
-    val loader = ImageLoader(context)
-    val req = ImageRequest.Builder(context)
-        .data(viewModel.imageURL.value) // demo link
-        .target { result ->
-            val bitmap = (result as BitmapDrawable).bitmap
-            saveImageToGallery(context, bitmap = bitmap, title = "test")
-        }
-        .build()
-    LaunchedEffect(Unit){
-        loader.execute(req)
-    }
+fun ImageContent(viewModel: ImageViewModel, scope: CoroutineScope, context: Context) {
     Column(Modifier.fillMaxSize()) {
         AsyncImage(
             model = viewModel.imageURL.value,
@@ -86,7 +76,9 @@ fun ImageContent(viewModel: ImageViewModel,context: Context) {
             modifier = Modifier
                 .weight(1f)
                 .clickable {
-//                    saveImageToGallery(context, bitmap = bitmap, title = "test")
+                    scope.launch {
+                        download(context, viewModel.imageURL.value)
+                    }
                 },
             placeholder = painterResource(
                 id = R.drawable.gpt_icon
@@ -100,7 +92,19 @@ fun ImageContent(viewModel: ImageViewModel,context: Context) {
     }
 }
 
-private fun saveImageToGallery(context: Context, bitmap: Bitmap, title: String) {
+suspend fun download(context: Context, url: String) {
+    val loader = ImageLoader(context)
+    val req = ImageRequest.Builder(context)
+        .data(url)
+        .target { result ->
+            val bitmap = (result as BitmapDrawable).bitmap
+            saveImageToGallery(context, bitmap = bitmap, title = "test")
+        }
+        .build()
+    loader.execute(req)
+}
+
+fun saveImageToGallery(context: Context, bitmap: Bitmap, title: String) {
     val values = ContentValues().apply {
         put(MediaStore.Images.Media.DISPLAY_NAME, "$title.jpg")
         put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
