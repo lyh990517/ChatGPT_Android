@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/feature-image-creation" />
             <option value="$PROJECT_DIR$/feature-image-edit" />
             <option value="$PROJECT_DIR$/feature-image-variation" />
+            <option value="$PROJECT_DIR$/gallery-search" />
             <option value="$PROJECT_DIR$/image-downloader" />
             <option value="$PROJECT_DIR$/presentation" />
           </set>

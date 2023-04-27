@@ -24,7 +24,7 @@ fun GPTApp(navigator: NavHostController = rememberNavController(), context: Cont
             ImageEditScreen(navigator = navigator)
         }
         composable("Image Variation") {
-            ImageVariationScreen(navigator = navigator)
+            ImageVariationScreen(navigator = navigator, context = context)
         }
     }
 }
