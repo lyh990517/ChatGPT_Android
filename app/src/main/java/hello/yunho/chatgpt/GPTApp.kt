@@ -1,5 +1,6 @@
 package hello.yunho.chatgpt
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,13 +12,13 @@ import com.example.feature_image_variation.ImageVariationScreen
 import hello.yunho.feature_chat.ChatScreen
 
 @Composable
-fun GPTApp(navigator: NavHostController = rememberNavController()) {
+fun GPTApp(navigator: NavHostController = rememberNavController(), context: Context) {
     NavHost(navController = navigator, startDestination = "Chat") {
         composable("Chat") {
             ChatScreen(navigator = navigator)
         }
         composable("Image Creation") {
-            ImageCreationScreen(navigator = navigator)
+            ImageCreationScreen(navigator = navigator, context = context)
         }
         composable("Image Edit") {
             ImageEditScreen(navigator = navigator)

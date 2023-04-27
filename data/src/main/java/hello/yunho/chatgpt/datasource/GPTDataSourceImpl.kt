@@ -11,6 +11,7 @@ import com.aallam.openai.api.image.ImageURL
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 @OptIn(BetaOpenAI::class)
@@ -28,13 +29,17 @@ class GPTDataSourceImpl @Inject constructor(private val openAI: OpenAI) : GPTDat
         return openAI.chatCompletions(chatCompletionRequest)
     }
 
-    override suspend fun requestCreateImage(prompt: String, numberOfImage: Int): List<ImageURL> {
-        return openAI.imageURL(
+    override suspend fun requestCreateImage(
+        prompt: String,
+        numberOfImage: Int
+    ): Flow<List<ImageURL>> {
+        val image = openAI.imageURL(
             creation = ImageCreation(
                 prompt = prompt,
                 n = numberOfImage,
                 size = ImageSize.is1024x1024
             )
         )
+        return flow { emit(image) }
     }
 }

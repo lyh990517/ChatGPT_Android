@@ -14,6 +14,6 @@ class ChatGPTRepositoryImpl @Inject constructor(private val gptDataSource: GPTDa
     override suspend fun sendChat(chat: String): Flow<ChatCompletionChunk> =
         gptDataSource.sendChat(chat)
 
-    override suspend fun requestCreateImage(prompt: String,numberOfImage:Int): List<ImageURL> =
+    override suspend fun requestCreateImage(prompt: String,numberOfImage:Int): Flow<List<ImageURL>> =
         gptDataSource.requestCreateImage(prompt,numberOfImage)
 }

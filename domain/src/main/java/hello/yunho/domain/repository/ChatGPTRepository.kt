@@ -9,5 +9,5 @@ import kotlinx.coroutines.flow.Flow
 interface ChatGPTRepository {
     suspend fun sendChat(chat: String): Flow<ChatCompletionChunk>
 
-    suspend fun requestCreateImage(prompt: String, numberOfImage: Int): List<ImageURL>
+    suspend fun requestCreateImage(prompt: String, numberOfImage: Int): Flow<List<ImageURL>>
 }

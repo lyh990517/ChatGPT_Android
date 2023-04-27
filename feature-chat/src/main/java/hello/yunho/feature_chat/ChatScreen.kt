@@ -31,7 +31,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import hello.yunho.presentation.state.GptState
+import hello.yunho.presentation.state.ChatState
 import hello.yunho.presentation.viewmodel.ChatViewModel
 import kotlinx.coroutines.launch
 
@@ -39,8 +39,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatScreen(
     navigator: NavHostController,
-    gptViewModel: ChatViewModel = hiltViewModel()
 ) {
+    val gptViewModel: ChatViewModel = hiltViewModel()
     val state = gptViewModel.gptState.collectAsState()
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
@@ -48,20 +48,20 @@ fun ChatScreen(
     Log.e("compose", "ChatScreen")
     LaunchedEffect(state.value) {
         when (state.value) {
-            is GptState.Idle -> {
+            is ChatState.Idle -> {
 
             }
-            is GptState.Loading -> {
+            is ChatState.Loading -> {
                 isGenerating.value = true
             }
-            is GptState.LoadChat -> {
+            is ChatState.LoadChat -> {
                 isGenerating.value = true
             }
-            is GptState.End -> {
+            is ChatState.End -> {
                 isGenerating.value = false
-                gptViewModel.gptState.value = GptState.Idle
+                gptViewModel.gptState.value = ChatState.Idle
             }
-            is GptState.Error -> {
+            is ChatState.Error -> {
 
             }
             else -> {}
