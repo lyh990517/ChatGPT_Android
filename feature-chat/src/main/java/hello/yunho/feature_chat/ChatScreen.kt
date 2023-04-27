@@ -1,5 +1,6 @@
 package hello.yunho.feature_chat
 
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -34,6 +35,7 @@ import hello.yunho.presentation.state.GptState
 import hello.yunho.presentation.viewmodel.ChatGPTViewModel
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ChatScreen(
     navigator: NavHostController,
@@ -65,16 +67,57 @@ fun ChatScreen(
             else -> {}
         }
     }
-    ChatContent(
-        gptViewModel, scrollState, isGenerating = isGenerating.value,
-        onChange = {
-            scope.launch {
-                scrollState.animateScrollTo(scrollState.maxValue)
+    Scaffold(
+        drawerContent = {
+            Drawer(navigator)
+        }, drawerBackgroundColor = Color.Black,
+        drawerElevation = 10.dp
+    ) {
+        ChatContent(
+            gptViewModel, scrollState, isGenerating = isGenerating.value,
+            onChange = {
+                scope.launch {
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
             }
-        }
-    )
+        )
+    }
     BackHandler {
         navigator.popBackStack()
+    }
+}
+
+@Composable
+fun Drawer(navigator: NavHostController) {
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        DrawerItem(text = "Image Creation", navigator)
+        DrawerItem(text = "Image Edit", navigator)
+        DrawerItem(text = "Image Variation", navigator)
+    }
+}
+
+@Composable
+fun DrawerItem(text: String, navigator: NavHostController) {
+    Card(
+        modifier = Modifier
+            .padding(start = 20.dp, end = 20.dp, top = 30.dp)
+            .fillMaxWidth()
+            .height(80.dp),
+        elevation = 5.dp,
+        shape = RoundedCornerShape(10.dp),
+        border = BorderStroke(width = 1.dp, color = Color.White),
+        backgroundColor = Color.Black
+    ) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .clickable { navigator.navigate(text) }) {
+            Text(
+                text = text,
+                color = Color.White,
+                modifier = Modifier.align(Alignment.Center),
+                fontSize = 18.sp
+            )
+        }
     }
 }
 
@@ -198,10 +241,13 @@ private fun Chat(
     onChange: () -> Unit = {}
 ) {
     Log.e("compose", "Chat")
-    val clipboardManager = LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clipboardManager =
+        LocalContext.current.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val clipData = ClipData.newPlainText("text", text)
-    val color = if (!isUser) Color(LocalContext.current.getColor(R.color.chat_back)) else Color.White
-    val icon = if (!isUser) painterResource(id = R.drawable.gpt_icon) else painterResource(id = R.drawable.baseline_person_24)
+    val color =
+        if (!isUser) Color(LocalContext.current.getColor(R.color.chat_back)) else Color.White
+    val icon =
+        if (!isUser) painterResource(id = R.drawable.gpt_icon) else painterResource(id = R.drawable.baseline_person_24)
     val profileBackGround = Color(LocalContext.current.getColor(R.color.chat_back))
     ConstraintLayout(
         modifier = Modifier

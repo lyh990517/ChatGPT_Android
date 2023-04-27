@@ -9,9 +9,18 @@ import hello.yunho.feature_chat.ChatScreen
 
 @Composable
 fun GPTApp(navigator: NavHostController = rememberNavController()) {
-    NavHost(navController = navigator, startDestination = "main") {
-        composable("main") {
+    NavHost(navController = navigator, startDestination = "Chat") {
+        composable("Chat") {
             ChatScreen(navigator = navigator)
+        }
+        composable("Image Creation"){
+
+        }
+        composable("Image Edit"){
+
+        }
+        composable("Image Variation"){
+
         }
     }
 }
