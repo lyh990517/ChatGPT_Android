@@ -5,6 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.feature_image_creation.ImageCreationScreen
+import com.example.feature_image_edit.ImageEditScreen
+import com.example.feature_image_variation.ImageVariationScreen
 import hello.yunho.feature_chat.ChatScreen
 
 @Composable
@@ -13,14 +16,14 @@ fun GPTApp(navigator: NavHostController = rememberNavController()) {
         composable("Chat") {
             ChatScreen(navigator = navigator)
         }
-        composable("Image Creation"){
-
+        composable("Image Creation") {
+            ImageCreationScreen(navigator = navigator)
         }
-        composable("Image Edit"){
-
+        composable("Image Edit") {
+            ImageEditScreen(navigator = navigator)
         }
-        composable("Image Variation"){
-
+        composable("Image Variation") {
+            ImageVariationScreen(navigator = navigator)
         }
     }
 }

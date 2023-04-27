@@ -1,16 +1,13 @@
 plugins {
-    id 'com.android.application'
+    id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'dagger.hilt.android.plugin'
-    id 'kotlin-kapt'
 }
 
 android {
-    namespace 'hello.yunho.chatgpt'
+    namespace 'com.example.feature_image_edit'
     compileSdk 33
 
     defaultConfig {
-        applicationId "hello.yunho.chatgpt"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -28,22 +25,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    flavorDimensions "version"
-    productFlavors {
-        free {
-            dimension "version"
-            manifestPlaceholders = [
-                    appLabel: "Free-Flavor"
-            ]
-            applicationIdSuffix ".free"
-            versionCode 10000
-            versionName "1.0.0"
-            buildConfigField "String", "EXPLAIN", "\"This is FREE-FLAVOR application\""
-            resValue "string", "appName", "Free-Flavor"
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -65,13 +46,9 @@ android {
 }
 
 dependencies {
-    implementation project(":feature-chat")
-    implementation project(":feature-image-creation")
-    implementation project(":feature-image-edit")
-    implementation project(":feature-image-variation")
-    implementation project(":presentation")
+
     implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'androidx.activity:activity-compose:1.3.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
@@ -82,7 +59,5 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
-    implementation "com.google.dagger:hilt-android:2.45"
-    kapt "com.google.dagger:hilt-compiler:2.45"
     implementation "androidx.navigation:navigation-compose:2.5.3"
 }

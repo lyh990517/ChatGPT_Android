@@ -15,6 +15,9 @@
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/feature-chat" />
+            <option value="$PROJECT_DIR$/feature-image-creation" />
+            <option value="$PROJECT_DIR$/feature-image-edit" />
+            <option value="$PROJECT_DIR$/feature-image-variation" />
             <option value="$PROJECT_DIR$/presentation" />
           </set>
         </option>
