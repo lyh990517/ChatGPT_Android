@@ -20,9 +20,10 @@ class ImageViewModel @Inject constructor(private val createImageUseCase: CreateI
     private val _uiState = MutableStateFlow<ImageState>(ImageState.Idle)
     val uiState = _uiState
 
-    val imageURL = mutableStateOf("https://fastly.picsum.photos/id/823/200/300.jpg?hmac=Sv69FIuXkj79IVp4uZ1YpgRHDGP0jadf5nSiTx1xSoo")
+    val imageURL = mutableStateOf("")
     val input = mutableStateOf("")
     val onSend: (String) -> Unit = {
+        createImage(input.value, 1)
         input.value = ""
     }
     val inputChange: (String) -> Unit = {
