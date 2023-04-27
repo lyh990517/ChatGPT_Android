@@ -32,14 +32,14 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import hello.yunho.presentation.state.GptState
-import hello.yunho.presentation.viewmodel.ChatGPTViewModel
+import hello.yunho.presentation.viewmodel.ChatViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ChatScreen(
     navigator: NavHostController,
-    gptViewModel: ChatGPTViewModel = hiltViewModel()
+    gptViewModel: ChatViewModel = hiltViewModel()
 ) {
     val state = gptViewModel.gptState.collectAsState()
     val scrollState = rememberScrollState()
@@ -123,7 +123,7 @@ fun DrawerItem(text: String, navigator: NavHostController) {
 
 @Composable
 private fun ChatContent(
-    gptViewModel: ChatGPTViewModel,
+    gptViewModel: ChatViewModel,
     scrollState: ScrollState,
     isGenerating: Boolean,
     onChange: () -> Unit,
@@ -139,7 +139,7 @@ private fun ChatContent(
 
 @Composable
 private fun ChatList(
-    gptViewModel: ChatGPTViewModel,
+    gptViewModel: ChatViewModel,
     isGenerating: Boolean
 ) {
     Column(
@@ -169,7 +169,7 @@ private fun ChatList(
 @Composable
 private fun OnCreateChat(
     scrollState: ScrollState,
-    gptViewModel: ChatGPTViewModel,
+    gptViewModel: ChatViewModel,
     onChange: () -> Unit,
     isGenerating: Boolean
 ) {

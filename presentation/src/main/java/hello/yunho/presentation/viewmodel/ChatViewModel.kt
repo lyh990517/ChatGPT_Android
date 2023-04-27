@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @OptIn(BetaOpenAI::class)
 @HiltViewModel
-class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChatUseCase) :
+class ChatViewModel @Inject constructor(private val sendChatUseCase: SendChatUseCase) :
     ViewModel() {
     private val _gptState = MutableStateFlow<GptState>(GptState.Idle)
     val gptState = _gptState
@@ -26,7 +26,7 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
 
     val onSend: (String) -> Unit = {
         input.value = ""
-        chatList.add(ChatUiModel(it,isUser = true))
+        chatList.add(ChatUiModel(it, isUser = true))
         chatResult.value = "Loading..."
         _gptState.value = GptState.Loading
         sendChat(it)
@@ -47,7 +47,7 @@ class ChatGPTViewModel @Inject constructor(private val sendChatUseCase: SendChat
             chatResult.value += it.message
             _gptState.value = GptState.Error(it)
         }.collect {
-            if(_gptState.value == GptState.Loading) chatResult.value = ""
+            if (_gptState.value == GptState.Loading) chatResult.value = ""
             _gptState.value = GptState.LoadChat
             chatResult.value += it.choices[0].delta?.content ?: ""
             if (it.choices[0].finishReason == "stop") {
