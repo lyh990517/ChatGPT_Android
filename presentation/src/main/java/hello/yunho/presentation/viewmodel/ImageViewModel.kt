@@ -30,7 +30,7 @@ class ImageViewModel @Inject constructor(private val createImageUseCase: CreateI
         input.value = it
     }
 
-    fun createImage(prompt: String, numberOfImage: Int) = viewModelScope.launch {
+    private fun createImage(prompt: String, numberOfImage: Int) = viewModelScope.launch {
         createImageUseCase.invoke(prompt, numberOfImage).catch {
             Log.e("it", "${it.message}")
             _uiState.value = ImageState.Error(it)

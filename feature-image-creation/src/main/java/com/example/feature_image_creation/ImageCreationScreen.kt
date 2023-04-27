@@ -36,6 +36,7 @@ fun ImageCreationScreen(
     context: Context,
     navigator: NavHostController,
 ) {
+    Log.e("compose", "ImageCreationScreen")
     val viewModel: ImageViewModel = hiltViewModel()
     val state = viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
@@ -57,7 +58,12 @@ fun ImageCreationScreen(
 }
 
 @Composable
-fun ImageContent(viewModel: ImageViewModel, scope: CoroutineScope, context: Context) {
+private fun ImageContent(
+    viewModel: ImageViewModel,
+    scope: CoroutineScope,
+    context: Context
+) {
+    Log.e("compose", "ImageContent")
     Column(Modifier.fillMaxSize()) {
         AsyncImage(
             model = viewModel.imageURL.value,
@@ -73,12 +79,17 @@ fun ImageContent(viewModel: ImageViewModel, scope: CoroutineScope, context: Cont
                 id = R.drawable.gpt_icon
             )
         )
-        Input(
-            inputChange = viewModel.inputChange,
-            onSend = viewModel.onSend,
-            text = viewModel.input.value
-        )
+        InputContent(viewModel)
     }
+}
+
+@Composable
+fun InputContent(viewModel: ImageViewModel) {
+    Input(
+        inputChange = viewModel.inputChange,
+        onSend = viewModel.onSend,
+        text = viewModel.input.value
+    )
 }
 
 @Composable
@@ -87,14 +98,14 @@ private fun Input(
     onSend: (String) -> Unit,
     text: String,
 ) {
-    Log.e("compose", "InputStateLess")
+    Log.e("compose", "Input")
     Box(Modifier.wrapContentHeight()) {
         OutlinedTextField(
             value = text,
             onValueChange = inputChange,
             modifier = Modifier.fillMaxWidth(),
             label = {
-                Text(text = "Message")
+                Text(text = "Image")
             }
         )
         IconButton(
