@@ -1,16 +1,8 @@
 package com.example.feature_image_creation
 
-import android.content.ContentResolver
-import android.content.ContentValues
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
@@ -26,16 +18,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
-import coil.request.ImageRequest
 import com.aallam.openai.api.BetaOpenAI
+import com.example.image_downloader.ImageDownloader
 import hello.yunho.presentation.state.ImageState
 import hello.yunho.presentation.viewmodel.ImageViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -77,7 +66,7 @@ fun ImageContent(viewModel: ImageViewModel, scope: CoroutineScope, context: Cont
                 .weight(1f)
                 .clickable {
                     scope.launch {
-                        download(context, viewModel.imageURL.value)
+                        ImageDownloader.download(context, viewModel.imageURL.value)
                     }
                 },
             placeholder = painterResource(
@@ -89,42 +78,6 @@ fun ImageContent(viewModel: ImageViewModel, scope: CoroutineScope, context: Cont
             onSend = viewModel.onSend,
             text = viewModel.input.value
         )
-    }
-}
-
-suspend fun download(context: Context, url: String) {
-    val loader = ImageLoader(context)
-    val req = ImageRequest.Builder(context)
-        .data(url)
-        .target { result ->
-            val bitmap = (result as BitmapDrawable).bitmap
-            saveImageToGallery(context, bitmap = bitmap, title = "test")
-        }
-        .build()
-    loader.execute(req)
-}
-
-fun saveImageToGallery(context: Context, bitmap: Bitmap, title: String) {
-    val values = ContentValues().apply {
-        put(MediaStore.Images.Media.DISPLAY_NAME, "$title.jpg")
-        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-    }
-
-    val resolver: ContentResolver = context.contentResolver
-    val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-
-    try {
-        uri?.let {
-            resolver.openOutputStream(uri).use { out ->
-                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
-                    throw Exception("Failed to save bitmap.")
-                }
-                Toast.makeText(context, "이미지가 다운로드 되었습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    } catch (e: Exception) {
-        Toast.makeText(context, "이미지 다운로드에 실패하였습니다.", Toast.LENGTH_SHORT).show()
     }
 }
 
