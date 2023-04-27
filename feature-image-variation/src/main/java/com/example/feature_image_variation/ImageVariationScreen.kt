@@ -64,10 +64,13 @@ fun SearchGalleryButton(context: Context, viewModel: ImageViewModel, scope: Coro
             Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
         }
         Text("Selected Image Path: ${selectedImagePath.value}")
-        if (selectedImageBitmap.value != null) Image(
-            bitmap = selectedImageBitmap.value!!,
-            contentDescription = ""
-        )
+        if (selectedImageBitmap.value != null){
+            Image(
+                bitmap = selectedImageBitmap.value!!,
+                contentDescription = ""
+            )
+//            viewModel.onMake(path.value)
+        }
         IconButton(
             onClick = {
                 viewModel.onMake(path.value)
@@ -92,4 +95,3 @@ fun SearchGalleryButton(context: Context, viewModel: ImageViewModel, scope: Coro
         )
     }
 }
-
