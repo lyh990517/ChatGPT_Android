@@ -10,4 +10,8 @@ interface GPTDataSource {
     suspend fun sendChat(chat: String): Flow<ChatCompletionChunk>
 
     suspend fun requestCreateImage(prompt: String, numberOfImage: Int): Flow<List<ImageURL>>
+
+    suspend fun requestVariationImage(fileSource: String, numberOfImage: Int): Flow<List<ImageURL>>
+
+    suspend fun requestEditImage(prompt: String, fileSource: String, masked: String, numberOfImage: Int): Flow<List<ImageURL>>
 }

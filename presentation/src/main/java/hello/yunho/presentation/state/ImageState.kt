@@ -8,6 +8,12 @@ sealed class ImageState {
 
     object Loading : ImageState()
 
+    object Create : ImageState()
+
+    object MakeVariation : ImageState()
+
+    object Edit : ImageState()
+
     @OptIn(BetaOpenAI::class)
     data class ImageLoadSuccess(val images: List<ImageURL>) : ImageState()
 
