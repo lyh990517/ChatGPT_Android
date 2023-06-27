@@ -25,3 +25,14 @@ Asynchronous:Coroutine Flow,
 <br>
 Image:Coil
 # App Preview
+<br>
+Chat
+<br>
+
+![KakaoTalk_Photo_2023-06-27-19-41-32](https://github.com/lyh990517/ChatGPT_Android/assets/45873564/866267b3-3bac-4175-be11-d8824a52ce21)
+
+<br>
+Image Creation
+<br>
+
+![KakaoTalk_Photo_2023-06-27-19-41-39](https://github.com/lyh990517/ChatGPT_Android/assets/45873564/f4e200e2-5460-432d-9fdd-ab7ba796de6b)
